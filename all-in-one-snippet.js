@@ -1,12 +1,72 @@
 (function () {
   'use strict';
 
-  Object.defineProperty(document, 'hidden', { get: () => false, configurable: true });
-  Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
+  const patch = () => {
+    try {
+      document.hasFocus = () => true;
+      window.hasFocus = () => true;
 
-  ['visibilitychange', 'webkitvisibilitychange', 'blur', 'focus'].forEach(evt => {
-    window.addEventListener(evt, e => e.stopImmediatePropagation(), true);
-  });
+      Object.defineProperty(document, 'hidden', { get: () => false, configurable: true });
+      Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
+
+      ['mozHidden', 'msHidden', 'webkitHidden'].forEach(p => {
+        Object.defineProperty(document, p, { get: () => false, configurable: true });
+      });
+
+      ['mozVisibilityState', 'msVisibilityState', 'webkitVisibilityState'].forEach(p => {
+        Object.defineProperty(document, p, { get: () => 'visible', configurable: true });
+      });
+
+      window.onblur = null;
+      window.onfocus = null;
+      document.onblur = null;
+      document.onfocus = null;
+      window.onbeforeunload = null;
+      document.onbeforeunload = null;
+
+      window.focus = () => true;
+      document.focus = () => true;
+    } catch (e) {}
+  };
+
+  const blockedEvents = [
+    'visibilitychange', 'webkitvisibilitychange', 'mozvisibilitychange', 'msvisibilitychange',
+    'blur', 'focus', 'focusin', 'focusout',
+    'mouseleave', 'mouseout', 'mouseenter', 'mouseover',
+    'pageshow', 'pagehide', 'resume', 'freeze',
+    'beforeunload'
+  ];
+
+  const blockHandler = e => {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const blockEvents = () => {
+    blockedEvents.forEach(ev => {
+      window.addEventListener(ev, blockHandler, true);
+      document.addEventListener(ev, blockHandler, true);
+    });
+  };
+
+  const hookAddEvent = () => {
+    const originalAdd = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function (type, listener, opts) {
+      if (blockedEvents.includes(type)) return;
+      return originalAdd.call(this, type, listener, opts);
+    };
+  };
+
+  patch();
+  blockEvents();
+  hookAddEvent();
+
+  setInterval(() => {
+    patch();
+    blockEvents();
+    hookAddEvent();
+  }, 100);
 
   window.oncontextmenu = null;
   document.oncontextmenu = null;
