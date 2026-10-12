@@ -187,7 +187,7 @@ Combines tab-switch bypass, right-click re-enable, and text-selection re-enable:
         const originalAddEventListener = EventTarget.prototype.addEventListener;
         EventTarget.prototype.addEventListener = function(type, listener, opts) {
             if (blocked.includes(type)) {
-                return; // Silently ignore attempts to add blocked listeners
+                return;
             }
             return originalAddEventListener.call(this, type, listener, opts);
         };
