@@ -156,7 +156,7 @@ Combines tab-switch bypass, right-click re-enable, and text-selection re-enable:
             window.focus = () => true;
             document.focus = () => true;
 
-        } catch(e) { /* Silently ignore errors */ }
+        } catch(e) {  }
     };
 
     const blockEvents = () => {
