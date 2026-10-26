@@ -1,4 +1,4 @@
-x`x# uzdevumi-lv-bypass
+# uzdevumi-lv-bypass
 
 A collection of DevTools console snippets that override the browser's Page Visibility API and re-enable right-click and text selection on sites that block them.
 
