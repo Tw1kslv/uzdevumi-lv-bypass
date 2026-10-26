@@ -1,4 +1,4 @@
-# uzdevumi-lv-bypass
+x`x# uzdevumi-lv-bypass
 
 A collection of DevTools console snippets that override the browser's Page Visibility API and re-enable right-click and text selection on sites that block them.
 
@@ -10,10 +10,11 @@ No extensions. No installs. No files to download. Just paste into the browser co
 
 | Protection | How the site does it | How this repo defeats it |
 |------------|----------------------|--------------------------|
-| Tab-switch detection | Listens to `visibilitychange`, `blur`, `focus` | Overrides `document.hidden` / `document.visibilityState`, blocks the events |
-| Disabled right-click | `oncontextmenu` handler | Clears the handler, stops the event in the capture phase |
-| Blocked text selection | `user-select: none` CSS, `onselectstart` handler | Re-enables `user-select`, clears handlers |
-| Blocked copy / cut | `oncopy` / `oncut` handlers | Clears them, stops the events |
+| **Tab-switch detection** | `visibilitychange` / `blur` / `focus` events, `document.hasFocus()`, and intercepting event registration | Overrides visibility and focus APIs, hooks `addEventListener` to block registration, stops events in the capture phase, and continuously re-applies overrides |
+| **Disabled right-click** | `oncontextmenu` handlers and invisible absolute-positioned overlays | Clears handlers, stops the event, and removes empty full-screen overlays |
+| **Blocked text selection** | `user-select: none` CSS, `selectstart` events, `Selection.removeAllRanges()`, and transparent `::selection` CSS | Re-enables `user-select`, stops events, overrides the Selection API to prevent clearing, and forces visible highlight colors |
+| **Blocked copy / cut** | `oncopy` / `oncut` handlers | Clears them, stops the events in the capture phase |
+| **Blocked paste** | `paste` event blocking and `input` event truncation | Stops `paste` and `input` events, and adds a value-restoration guard to form fields |
 
 ## Usage
 
